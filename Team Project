@@ -225,3 +225,4 @@ write_file = open("project.txt",'w')
 write_file.writelines([item for item in lines[:-3]])
 write_file.close()
 dsfsgdhsdh
+gfhfghfghfgh
