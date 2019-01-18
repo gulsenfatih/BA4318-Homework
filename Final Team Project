@@ -115,3 +115,44 @@ for i in range(0,3):
     hw_seasons = 2
     hw_estimates = estimate_HW(dataframe=train, name='VALUE', number_seasons=hw_seasons, sizeestimate=4)
     hw_rms = calculate_rms(testarray, hw_estimates)
+   
+
+    errors = [ma_rms, ses_rms, holt_rms, hw_rms]
+    min_err = min(errors)
+
+    print("Done.")
+    print("Now running selected best method.")
+
+    if ma_rms == min_err:
+        print("Best method for test data is Moving Average.")
+        ma_estimates = estimate_moving_average(dataframe=df, name='VALUE', windowsize=30, sizeestimate=4)
+        print("MA estimate for " + time_ch + ":", ma_estimates[-1])
+        with open("project.txt", "a") as myfile:
+            myfile.write("\n" + time_ch +" \t" + str(ma_estimates[-1]))
+    elif ses_rms == min_err:
+        print("Best method for test data is Simple Exponential Smoothing.")
+        ses_alpha = best_alpha
+        ses_estimates= estimate_SES(dataframe=df, name='VALUE', alpha=ses_alpha, sizeestimate=4)
+        print("SES Estimate for " + time_ch + ": ", ses_estimates[-1])
+        with open("project.txt", "a") as myfile:
+            myfile.write("\n" + time_ch +" \t" + str(ses_estimates[-1]))
+    elif hw_rms == min_err:
+        print("Best method for test data is Holt-Winters.")
+        hw_seasons = 2
+        hw_estimates = estimate_HW(dataframe=df, name='VALUE', number_seasons=hw_seasons, sizeestimate=4)
+        print("HW Estimate for " + time_ch + ":", hw_estimates[-1])
+        with open("project.txt", "a") as myfile:
+            myfile.write("\n" + time_ch +" \t" + str(hw_estimates[-1]))
+    elif holt_rms == min_err:
+        print("Best method for test data is Holt.")
+        holt_estimates= estimate_Holt(dataframe=df, name='VALUE', alpha=best_holtalpha, slope=best_holtslope, sizeestimate=4)
+        print("Holt Estimate for " + time_ch + ":", holt_estimates[-1])
+        with open("project.txt", "a") as myfile:
+            myfile.write("\n" + time_ch +" \t" + str(holt_estimates[-1]))
+            
+file = open("project.txt")
+lines = file.readlines()
+file.close()
+write_file = open("project.txt",'w')
+write_file.writelines([item for item in lines[:-3]])
+write_file.close()
