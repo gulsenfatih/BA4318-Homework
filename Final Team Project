@@ -1,0 +1,60 @@
+#Furkan Şaldır - 2076982
+#Furkan Nalçacıgil - 2075471
+#Muhammed Fatih Gülşen - 2076354
+
+import pandas as pd 
+import numpy as np
+from statsmodels.tsa.api import ExponentialSmoothing, SimpleExpSmoothing, Holt
+from sklearn.metrics import mean_squared_error
+from math import sqrt
+
+
+def calculate_rms(test,estimates):
+    rms = sqrt(mean_squared_error(test, estimates))
+    return rms
+
+
+
+def estimate_moving_average(dataframe, name, windowsize, sizeestimate):
+   
+    estimates = []
+   
+    copyframe = dataframe[[name]]
+    for index in range(sizeestimate): 
+        
+        estimate = copyframe[name].rolling(windowsize).mean().iloc[-1]
+        estimate = round(estimate,4) 
+        estimates.append(estimate)
+        size = len(copyframe)       
+        copyframe.loc[size] = [estimate]
+    return estimates
+
+def estimate_SES(dataframe, name, alpha, sizeestimate):
+    
+    array = np.asarray(dataframe[name])
+    model = SimpleExpSmoothing(array)
+    fit = model.fit(smoothing_level=alpha,optimized=False)
+    forecast = fit.forecast(sizeestimate)
+    for index in range ( len(forecast) ):
+        forecast[index] = round(forecast[index], 4)
+    return forecast
+
+def estimate_Holt(dataframe, name, alpha, slope, sizeestimate):
+    array = np.asarray(dataframe[name])
+    model = Holt(array)
+    fit = model.fit(smoothing_level = alpha,smoothing_slope = slope)
+    forecast = fit.forecast(sizeestimate)
+    for index in range ( len(forecast) ):
+        forecast[index] = round(forecast[index], 4)
+    return forecast
+
+
+def estimate_HW(dataframe, name, number_seasons, sizeestimate):
+    array = np.asarray(dataframe[name])
+    size = len(array)
+    model = ExponentialSmoothing(array, seasonal_periods=number_seasons ,trend='add', seasonal='add')
+    fit = model.fit()
+    forecast = fit.forecast(sizeestimate)
+    for index in range ( len(forecast) ):
+        forecast[index] = round(forecast[index], 4)
+    return forecast
